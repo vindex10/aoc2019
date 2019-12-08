@@ -1,0 +1,10 @@
+[package]
+name = "amplify"
+version = "1.0.0"
+
+[dependencies]
+itertools = "0.8.2"
+
+[[bin]]
+name = "amplify"
+path = "amplify.rs"
