@@ -1,3 +1,6 @@
+use std::io::Result;
+use std::fs::File;
+use std::io::{prelude::*, BufReader};
 use std::option::Option;
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -84,7 +87,34 @@ impl Forest {
     }
 }
 
+fn count_orbits(root:&RefCell<Node>, steps:i32) -> i32 {
+    let mut orbits = 0;
+    if let Some(children) = &((*root).borrow().children) {
+        for node in children.iter() {
+            orbits += steps + 1 + count_orbits(&node, steps+1);
+        }
+    }
+    return orbits;
+}
 
-fn main() {
-    let mut a = Forest::new();
+fn main() -> Result<()> {
+    let mut forest = Forest::new();
+
+    let f = File::open("input")?;
+    let reader = BufReader::new(f);
+
+    let mut a;
+    let mut b;
+    let mut pair_iter:Vec<String>;
+    for line in reader.lines() {
+        let pair = line.unwrap();
+        pair_iter = pair.trim().split(")").map(|s| String::from(s)).collect();
+        a = String::from(&pair_iter[0]);
+        b = String::from(&pair_iter[1]);
+        forest.add(&a, &b);
+    }
+
+    println!("{}", count_orbits(&*forest.roots["COM"], 0));
+
+    Ok(())
 }
