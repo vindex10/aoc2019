@@ -87,14 +87,44 @@ impl Forest {
     }
 }
 
-fn count_orbits(root:&RefCell<Node>, steps:i32) -> i32 {
+fn count_orbits(root:&Node, steps:i32) -> i32 {
     let mut orbits = 0;
-    if let Some(children) = &((*root).borrow().children) {
+    if let Some(children) = &((*root).children) {
         for node in children.iter() {
-            orbits += steps + 1 + count_orbits(&node, steps+1);
+            orbits += steps + 1 + count_orbits(&(*node).borrow(), steps+1);
         }
     }
     return orbits;
+}
+
+fn find_both(root:&Node) -> (i32, i32) {
+    let mut me = -1;
+    let mut santa = -1;
+    if (*root).id == "YOU" {
+        me = 0;
+    }
+    if (*root).id == "SAN" {
+        santa = 0;
+    }
+    if let Some(children) = &(*root).children {
+        for child in children.iter() {
+            if me >= 0 && santa >= 0 {
+                break;
+            }
+            let (found_me, found_santa) = find_both(&(*child).borrow());
+            if found_me >= 0 {
+                me = found_me + 1;
+            }
+            if found_santa >= 0 {
+                santa = found_santa + 1;
+            }
+        }
+    }
+
+    if me >= 0 && santa >= 0 {
+        return (me-1, santa-1);
+    }
+    return (me, santa);
 }
 
 fn main() -> Result<()> {
@@ -114,7 +144,9 @@ fn main() -> Result<()> {
         forest.add(&a, &b);
     }
 
-    println!("{}", count_orbits(&*forest.roots["COM"], 0));
+    println!("{}", count_orbits(&(*forest.roots["COM"]).borrow(), 0));
+    let (me, santa) = find_both(&((*forest.roots["COM"]).borrow()));
+    println!("{}", me+santa);
 
     Ok(())
 }
