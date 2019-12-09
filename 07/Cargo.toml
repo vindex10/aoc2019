@@ -6,5 +6,9 @@ version = "1.0.0"
 itertools = "0.8.2"
 
 [[bin]]
-name = "amplify"
-path = "amplify.rs"
+name = "amplify-1"
+path = "amplify-1.rs"
+
+[[bin]]
+name = "amplify-2"
+path = "amplify-2.rs"
